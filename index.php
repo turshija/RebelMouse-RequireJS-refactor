@@ -1,5 +1,5 @@
 <?php
-include "rebel_parser.class.php";
+include "lib/rebel_parser.class.php";
 $rebel = new RebelParser();
 
 $task = "show_changes";
