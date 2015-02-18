@@ -58,14 +58,14 @@ class RebelParser {
 
         if ($fileinfo->isReadable()) {
             if (!$numLines) {
+                if (!$fileinfo->getSize()) {
+                    return "";
+                }
                 $contents = $fileinfo->fread($fileinfo->getSize());
             } else {
                 $contents = "";
                 while (!$fileinfo->eof() && $numLines>0) {
                     $line = $fileinfo->fgets();
-                    // skip lines starting with chars from $charsSkip
-                    // if (in_array(trim($line)[0], $charsSkip)) continue;
-                    // if (empty(trim($line))) continue;
                     $contents .= $line;
                     $numLines--;
                 }
@@ -77,12 +77,15 @@ class RebelParser {
         }
     }
 
-    public function saveFileContents( $file ) {
-        // $fileinfo = new SplFileInfo('/tmp/foo.txt');
-        // if ($fileinfo->isWritable()) {
-        //     $fileobj = $fileinfo->openFile('a');
-        //     $fileobj->fwrite("appended this sample text");
-        // }
+    public function saveFileContents( $filepath, $contents ) {
+        $fileinfo = new SplFileInfo($filepath);
+        if ($fileinfo->isWritable()) {
+            $fileobj = $fileinfo->openFile('w');
+            $fileobj->fwrite($contents);
+            return 'Saved ' . $filepath;
+        } else {
+            return $filepath . ' is not writable !';
+        }
     }
 
     public function isOldSyntax( $contents ) {
