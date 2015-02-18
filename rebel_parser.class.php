@@ -19,6 +19,9 @@ class RebelParser {
     /* Regex - http://www.regexr.com/3aeoq */
     private $oldSyntaxRegex = "/(define|require)\(\[(.+?)\],(\s+?)function(.+?)?\((.+?)\)(.+?)?\{/mi";
 
+    /* Tab size */
+    private $tabSize = "    ";
+
     /* Returns all JS files from project */
     public function getJSFiles() {
         $dir_iterator = new RecursiveDirectoryIterator($this->rebelMousePath . $this->staticPath);
@@ -51,6 +54,7 @@ class RebelParser {
 
     public function readFileContents( $path, $numLines = 0 ) {
         $fileinfo = new SplFileObject( $path, "r" );
+        $charsSkip = array('/','*');
 
         if ($fileinfo->isReadable()) {
             if (!$numLines) {
@@ -59,10 +63,9 @@ class RebelParser {
                 $contents = "";
                 while (!$fileinfo->eof() && $numLines>0) {
                     $line = $fileinfo->fgets();
-                    // skip lines starting with /
-                    if (trim($line)[0] === "/") {
-                        continue;
-                    }
+                    // skip lines starting with chars from $charsSkip
+                    if (in_array(trim($line)[0], $charsSkip)) continue;
+                    if (empty(trim($line))) continue;
                     $contents .= $line;
                     $numLines--;
                 }
@@ -111,23 +114,44 @@ class RebelParser {
      *           template = require('hgn!widgets/templates/river/sidebar');
      */
     public function convertSyntax( $contents, $path = "" ) {
+        $defineOrRequire = array('define', 'require');
         preg_match_all($this->oldSyntaxRegex, $contents, $matches);
 
         $paths = array_map('trim', explode(',', $matches[2][0]));
         $vars = array_map('trim', explode(',', $matches[5][0]));
+        $function = array_map('trim', explode(',', $matches[1][0]))[0];
 
+        if (!in_array($function, $defineOrRequire)) {
+            return $this->arrayReturn(0, "\$function is not one of the: " . implode(', ', $defineOrRequire));
+        }
         if (!count($paths) || !count($vars)) {
             return $this->arrayReturn(0, "Path or Vars is empty !");
         }
-
         if ( count($paths) != count($vars) ) {
             return $this->arrayReturn(0, "Paths and Vars differ in size in file " . $path);
         }
-        return $this->arrayReturn(1, "");
+        $newSyntax = "define(function (require) {\n";
+        $newSyntax .= $this->tabSize . "var ";
 
+        for ($i = 0; $i < count($vars); $i++ ) {
+            if ($i > 0) {
+                $newSyntax .= $this->tabSize . $this->tabSize;
+            }
+            $newSyntax .= $vars[$i] . " = require(" . $paths[$i] . "),\n";
+        }
+        // remove new line and , from the end
+        $newSyntax = substr($newSyntax,0,-2);
+        $newSyntax .= ";\n";
+
+        // echo $newSyntax;
+        $newContents = preg_replace($this->oldSyntaxRegex, $newSyntax, $contents);
+        // echo $newContents;
+        // print_r($contents);
         // print_r($matches);
-        print_r($paths);
-        print_r($vars);
+        // print_r($paths);
+        // print_r($vars);
+        return $this->arrayReturn(1, $newContents);
+
     }
 
     private function arrayReturn( $status, $message ) {
