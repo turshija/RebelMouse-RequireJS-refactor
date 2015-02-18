@@ -17,7 +17,7 @@ class RebelParser {
     );
 
     /* Regex - http://www.regexr.com/3aeoq */
-    private $oldSyntaxRegex = "/(define|require)\(\[(.+?)\],(\s+?)function(.+?)?\((.+?)\)(.+?)?\{/mi";
+    private $oldSyntaxRegex = "/^(define|require)\(\[(.+?)\],(\s+?)function(.+?)?\((.+?)\)(.+?)?\{/mi";
 
     /* Tab size */
     private $tabSize = "    ";
@@ -64,8 +64,8 @@ class RebelParser {
                 while (!$fileinfo->eof() && $numLines>0) {
                     $line = $fileinfo->fgets();
                     // skip lines starting with chars from $charsSkip
-                    if (in_array(trim($line)[0], $charsSkip)) continue;
-                    if (empty(trim($line))) continue;
+                    // if (in_array(trim($line)[0], $charsSkip)) continue;
+                    // if (empty(trim($line))) continue;
                     $contents .= $line;
                     $numLines--;
                 }

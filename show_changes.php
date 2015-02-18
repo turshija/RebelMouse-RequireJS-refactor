@@ -3,7 +3,7 @@ $files = $rebel->getJSFiles();
 
 foreach ($files as $file) {
     // $contents = $rebel->readFileContents( "../rebelmouse/static/js/widgets/views/dashboard/select.js", 10);
-    $contents = $rebel->readFileContents( $file['path'], 10 );
+    $contents = $rebel->readFileContents( $file['path'], 20 );
 
     $isOld = $rebel->isOldSyntax( $contents );
 
