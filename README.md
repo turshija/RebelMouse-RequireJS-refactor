@@ -18,3 +18,6 @@ define(function (require) {
       SelectorView = require('widgets/views/selector'),
       template = require('hgn!widgets/templates/river/sidebar');
 ```
+
+![Screenshot]
+(http://i.pics.rs/J7Hvq)
