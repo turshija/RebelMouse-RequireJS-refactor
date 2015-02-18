@@ -1,5 +1,5 @@
 <?php
-include "lib/rebel_parser.class.php";
+include "src/lib/rebel_parser.class.php";
 $rebel = new RebelParser();
 ?>
 <a href="?task=check_mismatch">Check files for arguments mismatch</a>
@@ -13,7 +13,7 @@ if (isset($_GET['task'])) $task = $_GET['task'];
 else $task = "check_mismatch";
 
 switch ($task) {
-    case "check_mismatch": include "arguments_mismatch.php";break;
-    case "show_changes": include "show_changes.php";break;
-    case "make_changes": include "make_changes.php";break;
+    case "check_mismatch": include "src/arguments_mismatch.php";break;
+    case "show_changes": include "src/show_changes.php";break;
+    case "make_changes": include "src/make_changes.php";break;
 }
